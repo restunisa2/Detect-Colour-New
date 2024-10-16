@@ -70,4 +70,3 @@ if query_params.get("action") == ["process_image"]:
         st.image(processed_image)  # Tampilkan gambar yang sudah diproses
     else:
         st.error("Tidak ada data gambar yang ditemukan.")
-
