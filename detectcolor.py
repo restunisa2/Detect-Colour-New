@@ -60,6 +60,6 @@ def detect_color(hue, saturation, value):
 
 # Membuat endpoint untuk menerima gambar dari browser
 if query_params = st.query_params().get("action") == "process_image":
-    image_data = st.experimental_get_query_params().get("image")[0]
+    image_data = query_params = st.query_params().get("image")[0]
     processed_image = process_image(image_data)
     st.image(processed_image)
