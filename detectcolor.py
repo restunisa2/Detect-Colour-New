@@ -5,35 +5,10 @@ import base64
 from PIL import Image
 from io import BytesIO
 
+# Judul aplikasi
 st.title("Program Pengenalan Warna")
 
-def process_image(image_data):
-    # Decode base64 image
-    image_data = image_data.split(",")[1]
-    image = Image.open(BytesIO(base64.b64decode(image_data)))
-    frame = np.array(image)
-
-    # Konversi frame dari RGB ke HSV
-    hsv_frame = cv2.cvtColor(frame, cv2.COLOR_RGB2HSV)
-    height, width, _ = frame.shape
-
-    # Koordinat tengah frame
-    cx = int(width / 2)
-    cy = int(height / 2)
-
-    # Mengambil nilai warna piksel di tengah frame
-    pixel_center = hsv_frame[cy, cx]
-    hue = pixel_center[0]
-    saturation = pixel_center[1]
-    value = pixel_center[2]
-
-    # Deteksi warna (sama dengan kode sebelumnya)
-    color = detect_color(hue, saturation, value)
-
-    # Tambahkan teks warna ke gambar
-    cv2.putText(frame, color, (cx - 100, cy - 150), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 8)
-    return frame
-
+# Fungsi untuk mendeteksi warna
 def detect_color(hue, saturation, value):
     if saturation < 3:
         return "PUTIH"
@@ -58,15 +33,47 @@ def detect_color(hue, saturation, value):
     else:
         return "MERAH"
 
-# Membuat endpoint untuk menerima gambar dari browser
-query_params = st.query_params()  # Menggunakan st.query_params()
+# Fungsi untuk memproses gambar
+def process_image(image_data):
+    # Decode base64 image
+    image_data = image_data.split(",")[1]
+    image = Image.open(BytesIO(base64.b64decode(image_data)))
+    frame = np.array(image)
 
-# Periksa apakah parameter "action" adalah "process_image"
+    # Konversi frame dari RGB ke HSV
+    hsv_frame = cv2.cvtColor(frame, cv2.COLOR_RGB2HSV)
+    height, width, _ = frame.shape
+
+    # Koordinat tengah frame
+    cx = int(width / 2)
+    cy = int(height / 2)
+
+    # Mengambil nilai warna piksel di tengah frame
+    pixel_center = hsv_frame[cy, cx]
+    hue = pixel_center[0]
+    saturation = pixel_center[1]
+    value = pixel_center[2]
+
+    # Deteksi warna
+    color = detect_color(hue, saturation, value)
+
+    # Tambahkan teks warna ke gambar
+    cv2.putText(frame, color, (cx - 100, cy - 150), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 8)
+
+    return frame
+
+# Mengambil parameter kueri dari URL
+query_params = st.query_params()
+
+# Memeriksa apakah parameter "action" adalah "process_image"
 if query_params.get("action") == ["process_image"]:
     image_data = query_params.get("image", [None])[0]  # Ambil gambar dari query params, default ke None
 
     if image_data is not None:
         processed_image = process_image(image_data)  # Proses gambar
-        st.image(processed_image)  # Tampilkan gambar yang sudah diproses
+        st.image(processed_image, caption="Hasil Deteksi Warna", use_column_width=True)  # Tampilkan gambar yang sudah diproses
     else:
         st.error("Tidak ada data gambar yang ditemukan.")
+else:
+    st.warning("Silakan kirim gambar dengan parameter 'action=process_image' dalam URL.")
+
