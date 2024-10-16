@@ -1,0 +1,33 @@
+<video id="video" width="640" height="480" autoplay></video>
+<button id="capture">Capture Image</button>
+<canvas id="canvas" width="640" height="480"></canvas>
+
+<script>
+  const video = document.getElementById('video');
+
+  // Akses webcam
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then((stream) => {
+      video.srcObject = stream;
+    })
+    .catch((err) => {
+      console.error("Error accessing the camera: " + err);
+    });
+
+  const captureButton = document.getElementById('capture');
+  const canvas = document.getElementById('canvas');
+  const context = canvas.getContext('2d');
+
+  captureButton.addEventListener('click', () => {
+    // Mengambil gambar dari video
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Mengirim gambar ke Streamlit server
+    const dataUrl = canvas.toDataURL('image/jpeg');
+    fetch('/process_image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: dataUrl })
+    });
+  });
+</script>
