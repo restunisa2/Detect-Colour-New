@@ -58,7 +58,8 @@ def detect_color(hue, saturation, value):
     else:
         return "MERAH"
 
-query_params = st.experimental_get_query_params()  # Atau gunakan st.query_params() jika Anda sudah memperbarui Streamlit
+# Membuat endpoint untuk menerima gambar dari browser
+query_params = st.query_params()  # Menggunakan st.query_params()
 
 # Periksa apakah parameter "action" adalah "process_image"
 if query_params.get("action") == ["process_image"]:
@@ -69,3 +70,4 @@ if query_params.get("action") == ["process_image"]:
         st.image(processed_image)  # Tampilkan gambar yang sudah diproses
     else:
         st.error("Tidak ada data gambar yang ditemukan.")
+
